@@ -92,7 +92,7 @@ Here's a list of new functions and their definitions based on the suggested impr
 These functions are being implemented in the script to enhance its functionality, reliability, and usability based on the suggested improvements.
 
 ## Demo
-![CodeGeneratorGPT-Demo](https://dropovercl.s3.amazonaws.com/4aeec8bd-94c4-48f9-b2a3-439b9135f96c/3be96f32-f99a-4849-b441-c478ef724963/ffa58682-4c7f-4233-bcdb-9c110ca63b79.gif)
+[CodeGeneratorGPT-Demo](https://dropovercl.s3.amazonaws.com/4aeec8bd-94c4-48f9-b2a3-439b9135f96c/3be96f32-f99a-4849-b441-c478ef724963/ffa58682-4c7f-4233-bcdb-9c110ca63b79.gif)
 
 ## Contributing
 
