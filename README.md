@@ -1,15 +1,15 @@
-# CodeGeneratorGPT
+# ✨ CodeGeneratorGPT ✨
 
 This script, called CodeGeneratorGPT, refactors and improves Python code using OpenAI's GPT-3 model. It takes a large Python file as input, splits it into smaller chunks or code blocks, generates refactored 
 code using the GPT-3 model, and combines the refactored chunks into a single output file.
 
-## Features
+## 🖥️ Features
 
 - Splits a large Python file into smaller chunks
 - Generates refactored code using OpenAI's GPT-3 model
 - Combines refactored chunks into a single output file
 
-## Installation
+## 💿 Installation
 
 1. Clone the repository:
 
@@ -35,7 +35,7 @@ pip install -r requirements.txt
 export OPENAI_API_KEY="your_openai_api_key_here"
 ```
 
-## Usage
+## 🧑‍💻 Usage
 
 1. Run the script:
 
@@ -51,7 +51,7 @@ Please enter the path to the large Python file: /path/to/your/python/file.py
 
 3. The script will generate a refactored output file named `refactored_python_script.py` and a `context.txt` file with summaries for each chunk.
 
-## Work in Progress
+## ⚠️ Work in Progress
 
 Here's a list of new functions and their definitions based on the suggested improvements:
 
