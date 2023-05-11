@@ -40,7 +40,11 @@ export OPENAI_API_KEY="your_openai_api_key_here"
 1. Run the script:
 
 ```
-python main.py
+python CodeGeneratorGPT.py
+```
+or
+```
+python3 CodeGeneratorGPT.py
 ```
 
 2. Provide the path to the large Python file when prompted:
