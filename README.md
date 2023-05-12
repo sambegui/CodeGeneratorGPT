@@ -91,6 +91,9 @@ Here's a list of new functions and their definitions based on the suggested impr
 
 These functions are being implemented in the script to enhance its functionality, reliability, and usability based on the suggested improvements.
 
+## 🛑 Bugs
+1. Logic needs to be added to check and verify the chunks contain full code blocks to avoid cut-offs.
+
 ## Demo
 ![CodeGeneratorGPT-Demo](CodeGeneratorGPT-Demo.gif)
 
