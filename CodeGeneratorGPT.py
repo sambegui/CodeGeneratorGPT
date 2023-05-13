@@ -162,12 +162,11 @@ if __name__ == "__main__":
     
     context_file = "context.txt"
     remove_file(context_file)  # Remove the context.txt file before each script execution
+    clean_directory(output_dir)
+    clean_directory(modified_output_dir)
     
     chunks = split_python_file(input_file)
     save_chunks(chunks, output_dir)
     modified_chunks = generate_modified_chunks(input_file, modified_output_dir)
     combine_chunks(modified_chunks, output_file)
     remove_leading_newline(output_file)
-    
-    clean_directory(output_dir)
-    clean_directory(modified_output_dir)
