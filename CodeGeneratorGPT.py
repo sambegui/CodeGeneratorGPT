@@ -51,7 +51,7 @@ def generate_code(prompt, model_engine='text-davinci-003', max_tokens=1024, temp
     except Exception as e:
         raise RuntimeError(f"API call failed: {e}")
 
-def split_python_file(file_path, max_tokens=1024):
+def split_python_file(file_path, context, max_tokens=1024):
     function_pattern = re.compile(r"^\s*?def\s.*?\w+\(.*?\):")
     with open(file_path, "r") as file:
         lines = file.readlines()
@@ -61,66 +61,41 @@ def split_python_file(file_path, max_tokens=1024):
     tokens = 0
     for line in lines:
         if function_pattern.match(line) and tokens > max_tokens:
-            chunks.append(chunk)
+            chunks.append({"context": context, "code": chunk})
             chunk = []
             tokens = 0
         chunk.append(line)
         tokens += len(line)
-    chunks.append(chunk)
+    chunks.append({"context": context, "code": chunk})
 
     return chunks
 
 def save_chunks(chunks, output_dir):
     Path(output_dir).mkdir(parents=True, exist_ok=True)
-    seq = "aa"
-    for chunk in chunks:
-        with open(f"{output_dir}/{seq}", "w") as chunk_file:
-            chunk_file.writelines(chunk)
-        seq = increment_seq(seq)
+    for i, chunk in enumerate(chunks):
+        with open(f"{output_dir}/chunk_{i}.py", "w") as chunk_file:
+            chunk_file.writelines(chunk["code"])
 
-def increment_seq(s):
-    s = list(s)
-    for i in range(len(s) - 1, -1, -1):
-        if s[i] == 'z':
-            s[i] = 'a'
-        else:
-            s[i] = chr(ord(s[i]) + 1)
-            break
-    else:
-        s.insert(0, 'a')
-    return ''.join(s)
-
-def generate_modified_chunks(input_file, modified_chunks_dir, max_tokens=1024):
+def generate_modified_chunks(chunks, modified_chunks_dir):
     Path(modified_chunks_dir).mkdir(parents=True, exist_ok=True)
     modified_chunks = []
     
-    with open(input_file, "r", encoding="ISO-8859-1") as f:
-        content = f.read()
-        
-    lines = content.splitlines()
-    num_lines = len(lines)
-    chunk_size = max_tokens // 20  # Estimate average tokens per line
-    num_chunks = (num_lines + chunk_size - 1) // chunk_size
-    
-    context_file = "context.txt"
-    
-    for i in range(num_chunks):
-        start_line = i * chunk_size
-        end_line = min((i + 1) * chunk_size, num_lines)
-        chunk = "\n".join(lines[start_line:end_line]).lstrip("\n")  # Strip leading newlines
+    for i, chunk in enumerate(chunks):
+        context = chunk["context"]
+        code = "".join(chunk["code"])
         
         # Generate a summary of the current chunk
-        summary_prompt = f"Summarize the purpose of the following python code:\n{chunk}"
+        summary_prompt = f"Summarize the purpose of the following python code:\n{code}"
         summary = generate_code(summary_prompt).strip()
         
         # Append the summary to the context.txt file
-        with open(context_file, "a") as f:
+        with open(f"{modified_chunks_dir}/context.txt", "a") as f:
             f.write(f"Chunk {i} summary: {summary}\n\n")
             
-        prompt = f"python code:\n{chunk}\n\nRefactor and improve the code above:"
+        prompt = f"{context}\n\nRefactor and improve the code above:"
         
         modified_chunk = generate_code(prompt)
-        modified_chunks.append({"input_chunk": chunk, "modified_chunk": modified_chunk})
+        modified_chunks.append({"input_chunk": code, "modified_chunk": modified_chunk})
         
         modified_chunk_path = f"{modified_chunks_dir}/chunk_{i}_modified.py"
         with open(modified_chunk_path, "w") as modified_chunk_file:
@@ -149,20 +124,25 @@ def remove_file(file_path):
 def clean_directory(directory):
     shutil.rmtree(directory)
         
-if __name__ == "__main__":
-    input_file = input("Please enter the path to the large Python file: ")
+def refactor_large_code(input_file, output_file):
+    input_dir = os.path.dirname(input_file)
+    modified_chunks_dir = os.path.join(input_dir, "modified_chunks")
     
-    output_dir = "chunks"
-    modified_output_dir = "modified_chunks"
-    output_file = "refactored_python_script.py"
-    
-    context_file = "context.txt"
+    context_file = os.path.join(modified_chunks_dir, "context.txt")
     remove_file(context_file)  # Remove the context.txt file before each script execution
-    clean_directory(output_dir)
-    clean_directory(modified_output_dir)
+    clean_directory(modified_chunks_dir)
     
-    chunks = split_python_file(input_file)
-    save_chunks(chunks, output_dir)
-    modified_chunks = generate_modified_chunks(input_file, modified_output_dir)
+    with open(input_file, "r", encoding="ISO-8859-1") as f:
+        content = f.read()
+    
+    chunks = split_python_file(input_file, content)
+    save_chunks(chunks, input_dir)
+    modified_chunks = generate_modified_chunks(chunks, modified_chunks_dir)
     combine_chunks(modified_chunks, output_file)
     remove_leading_newline(output_file)
+
+if __name__ == "__main__":
+    input_file = input("Please enter the path to the large Python file: ")
+    output_file = "refactored_python_script.py"
+    
+    refactor_large_code(input_file, output_file)
