@@ -27,11 +27,12 @@ def generate_code(prompt, model_engine='text-davinci-003', max_tokens=1024, temp
     """
     
     # Check for API key
-    if 'OPENAI_API_KEY' not in os.environ:
+    api_key = os.getenv('OPENAI_API_KEY')
+    if not api_key:
         raise ValueError("API key not set. Please set the 'OPENAI_API_KEY' environment variable.")
         
     # Initialize the OpenAI API client
-    openai.api_key = os.environ['OPENAI_API_KEY']
+    openai.api_key = api_key
     
     try:
         # Generate the code
@@ -49,6 +50,7 @@ def generate_code(prompt, model_engine='text-davinci-003', max_tokens=1024, temp
         return code
     except Exception as e:
         raise RuntimeError(f"API call failed: {e}")
+
 def split_python_file(file_path, max_tokens=1024):
     function_pattern = re.compile(r"^\s*?def\s.*?\w+\(.*?\):")
     with open(file_path, "r") as file:
@@ -87,12 +89,6 @@ def increment_seq(s):
     else:
         s.insert(0, 'a')
     return ''.join(s)
-
-nlp = spacy.load("en_core_web_sm")
-
-def count_tokens(text):
-    doc = nlp(text)
-    return len(doc)
 
 def generate_modified_chunks(input_file, modified_chunks_dir, max_tokens=1024):
     Path(modified_chunks_dir).mkdir(parents=True, exist_ok=True)
